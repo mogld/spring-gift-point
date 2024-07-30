@@ -37,6 +37,11 @@ public class WebController {
     @Autowired
     private ProductOptionService productOptionService;
 
+    @GetMapping("/")
+    public String home() {
+        return "home";
+    }
+
     @GetMapping("/register")
     public String showRegisterForm() {
         return "register";
@@ -45,7 +50,7 @@ public class WebController {
     @GetMapping("/order")
     public String showOrderForm(@RequestParam(name = "optionId", required = false) Long optionId, Model model) {
         model.addAttribute("optionId", optionId);
-        return "order";
+        return "Order";
     }
 
     @GetMapping("/user-wishes")
