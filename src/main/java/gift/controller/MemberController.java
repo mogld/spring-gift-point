@@ -10,20 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/members")
+@RequestMapping("/api/members")
 @Tag(name = "Member API", description = "APIs related to member operations")
 public class MemberController {
 
     @Autowired
     private MemberService memberService;
 
-    @Operation(summary = "회원 가입", description = "새로운 회원을 등록한다.")
+    @Operation(summary = "회원 가입", description = "새 회원을 등록하고 토큰을 받는다.")
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody Member member, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -37,7 +34,7 @@ public class MemberController {
         }
     }
 
-    @Operation(summary = "로그인", description = "회원 로그인")
+    @Operation(summary = "로그인", description = "회원을 인증하고 토큰을 받는다.")
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Member member) {
         Member authenticatedMember = memberService.authenticate(member.getEmail(), member.getPassword());

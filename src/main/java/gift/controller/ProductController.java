@@ -32,7 +32,7 @@ public class ProductController {
         this.categoryService = categoryService;
     }
 
-    @Operation(summary = "상품 추가", description = "새로운 상품을 등록한다.")
+    @Operation(summary = "상품 생성", description = "새 상품을 등록한다.")
     @PostMapping
     public ResponseEntity<Object> addProduct(@Valid @RequestBody Product product, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -43,8 +43,9 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}", consumes = "application/x-www-form-urlencoded", produces = "application/json")
-    public ResponseEntity<Object> updateProduct(@PathVariable Long id, @Valid @ModelAttribute Product updatedProduct, BindingResult bindingResult) {
+    @Operation(summary = "상품 수정", description = "기존 상품의 정보를 수정한다.")
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateProduct(@PathVariable Long id, @Valid @RequestBody Product updatedProduct, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -68,13 +69,13 @@ public class ProductController {
         return new ResponseEntity<>(existingProduct, HttpStatus.OK);
     }
 
-    @Operation(summary = "상품 목록 조회", description = "상품 목록을 페이징하여 조회한다.")
+    @Operation(summary = "상품 목록 조회 (페이지네이션 적용)", description = "모든 상품의 목록을 페이지 단위로 조회한다.")
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(Pageable pageable) {
         return productService.getAllProducts(pageable);
     }
 
-    @Operation(summary = "상품 조회", description = "ID로 상품을 조회한다.")
+    @Operation(summary = "상품 조회", description = "특정 상품의 정보를 조회한다.")
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Product product = productService.findById(id);
@@ -84,7 +85,7 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @Operation(summary = "상품 삭제", description = "ID로 상품을 삭제한다.")
+    @Operation(summary = "상품 삭제", description = "특정 상품을 삭제한다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.delete(id);

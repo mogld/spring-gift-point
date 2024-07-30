@@ -47,11 +47,6 @@ public class WebController {
         return "order";
     }
 
-    // @GetMapping("/login")
-    // public String showLoginForm() {
-    //    return "login";
-    // }
-
     @GetMapping("/user-wishes")
     public String showWishesPage() {
         return "user-wishes";
