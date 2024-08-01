@@ -3,6 +3,7 @@ package gift.dto;
 public class WishRequest {
     private Long productId;
     private Long optionId;
+    private int quantity; // 추가된 필드
 
     public WishRequest() {
     }
@@ -21,5 +22,13 @@ public class WishRequest {
 
     public void setOptionId(Long optionId) {
         this.optionId = optionId;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

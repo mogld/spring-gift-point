@@ -2,6 +2,8 @@ package gift.controller;
 
 import gift.auth.JwtTokenUtil;
 import gift.dto.DomainResponse;
+import gift.dto.MemberRequest;
+import gift.dto.MemberResponse;
 import gift.model.HttpResult;
 import gift.model.Member;
 import gift.service.MemberService;
@@ -28,15 +30,15 @@ public class MemberController {
 
     @Operation(summary = "회원 가입", description = "새 회원을 등록하고 토큰을 받는다.")
     @PostMapping("/register")
-    public ResponseEntity<DomainResponse> register(@Valid @RequestBody Member member, BindingResult bindingResult) {
+    public ResponseEntity<DomainResponse> register(@Valid @RequestBody MemberRequest memberRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             HttpResult httpResult = new HttpResult(HttpStatus.BAD_REQUEST.value(), "Validation errors");
             return new ResponseEntity<>(new DomainResponse(httpResult, List.of(Map.of("errors", bindingResult.getAllErrors().toString())), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
         }
         try {
-            memberService.register(member.getEmail(), member.getPassword());
+            MemberResponse memberResponse = memberService.register(memberRequest);
             HttpResult httpResult = new HttpResult(HttpStatus.OK.value(), "User registered successfully");
-            return new ResponseEntity<>(new DomainResponse(httpResult, List.of(Map.of("message", "User registered successfully")), HttpStatus.OK), HttpStatus.OK);
+            return new ResponseEntity<>(new DomainResponse(httpResult, List.of(memberResponse), HttpStatus.OK), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             HttpResult httpResult = new HttpResult(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return new ResponseEntity<>(new DomainResponse(httpResult, List.of(Map.of("error", e.getMessage())), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
@@ -45,8 +47,8 @@ public class MemberController {
 
     @Operation(summary = "로그인", description = "회원을 인증하고 토큰을 받는다.")
     @PostMapping("/login")
-    public ResponseEntity<DomainResponse> login(@RequestBody Member member) {
-        Member authenticatedMember = memberService.authenticate(member.getEmail(), member.getPassword());
+    public ResponseEntity<DomainResponse> login(@RequestBody MemberRequest memberRequest) {
+        MemberResponse authenticatedMember = memberService.authenticate(memberRequest.getEmail(), memberRequest.getPassword());
         if (authenticatedMember != null) {
             String token = JwtTokenUtil.generateToken(authenticatedMember);
             HttpResult httpResult = new HttpResult(HttpStatus.OK.value(), "Login successful");

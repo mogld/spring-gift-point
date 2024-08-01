@@ -9,14 +9,14 @@ import java.util.Map;
 public class DomainResponse {
 
     private HttpResult httpResult;
-    private List<Map<String, Object>> domain;
+    private List<Map<String, Object>> data;
     private HttpStatus httpStatus;
 
     public DomainResponse() {}
 
-    public DomainResponse(HttpResult httpResult, List<Map<String, Object>> domain, HttpStatus httpStatus) {
+    public DomainResponse(HttpResult httpResult, List<Map<String, Object>> data, HttpStatus httpStatus) {
         this.httpResult = httpResult;
-        this.domain = domain;
+        this.data = data;
         this.httpStatus = httpStatus;
     }
 
@@ -28,12 +28,12 @@ public class DomainResponse {
         this.httpResult = httpResult;
     }
 
-    public List<Map<String, Object>> getDomain() {
-        return domain;
+    public List<Map<String, Object>> getData() {
+        return data;
     }
 
-    public void setDomain(List<Map<String, Object>> domain) {
-        this.domain = domain;
+    public void setData(List<Map<String, Object>> data) {
+        this.data = data;
     }
 
     public HttpStatus getHttpStatus() {

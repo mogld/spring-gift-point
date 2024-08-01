@@ -1,45 +1,32 @@
-package gift.model;
+package gift.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class ProductRequest {
     @NotBlank(message = "상품을 입력해주세요")
     @Size(max = 15, message = "상품 이름은 최대 15자까지 입력할 수 있습니다")
     @Pattern(regexp = "^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9\\s\\(\\)\\[\\]\\+\\-\\&\\/\\_]+$", message = "특수문자는 (),[],+,-,&,/,_만 가능합니다")
     @Pattern(regexp = "^(?!.*카카오).*$", message = "상품 이름에 '카카오'를 포함할 수 없습니다. 관리자와의 협의가 필요합니다.")
     private String name;
 
-    @Column(nullable = false)
+    @NotNull(message = "상품 가격을 입력해주세요")
     private Integer price;
 
-    @Column(nullable = false)
+    @NotBlank(message = "상품 이미지를 입력해주세요")
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    @NotNull(message = "카테고리를 입력해주세요")
+    private Long categoryId;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductOption> options = new ArrayList<>();
+    @NotNull(message = "옵션을 입력해주세요")
+    private List<ProductOptionRequest> options;
 
-    public Product() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
+    // Getters and Setters
     public String getName() {
         return name;
     }
@@ -64,24 +51,19 @@ public class Product {
         this.imageUrl = imageUrl;
     }
 
-    public Category getCategory() {
-        return category;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public List<ProductOption> getOptions() {
+    public List<ProductOptionRequest> getOptions() {
         return options;
     }
 
-    public void setOptions(List<ProductOption> options) {
+    public void setOptions(List<ProductOptionRequest> options) {
         this.options = options;
-        if (options != null) {
-            for (ProductOption option : options) {
-                option.setProduct(this);
-            }
-        }
     }
 }

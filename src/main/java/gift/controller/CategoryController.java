@@ -33,6 +33,9 @@ public class CategoryController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", category.getId());
                     map.put("name", category.getName());
+                    map.put("color", category.getColor());
+                    map.put("imageUrl", category.getImageUrl());
+                    map.put("description", category.getDescription());
                     return map;
                 })
                 .collect(Collectors.toList());
@@ -47,6 +50,9 @@ public class CategoryController {
         Map<String, Object> createdCategoryMap = new HashMap<>();
         createdCategoryMap.put("id", createdCategory.getId());
         createdCategoryMap.put("name", createdCategory.getName());
+        createdCategoryMap.put("color", createdCategory.getColor());
+        createdCategoryMap.put("imageUrl", createdCategory.getImageUrl());
+        createdCategoryMap.put("description", createdCategory.getDescription());
         HttpResult httpResult = new HttpResult(HttpStatus.CREATED.value(), "Category created successfully");
         return ResponseEntity.status(HttpStatus.CREATED).body(new DomainResponse(httpResult, List.of(createdCategoryMap), HttpStatus.CREATED));
     }
@@ -58,7 +64,36 @@ public class CategoryController {
         Map<String, Object> updatedCategoryMap = new HashMap<>();
         updatedCategoryMap.put("id", updatedCategory.getId());
         updatedCategoryMap.put("name", updatedCategory.getName());
+        updatedCategoryMap.put("color", updatedCategory.getColor());
+        updatedCategoryMap.put("imageUrl", updatedCategory.getImageUrl());
+        updatedCategoryMap.put("description", updatedCategory.getDescription());
         HttpResult httpResult = new HttpResult(HttpStatus.OK.value(), "Category updated successfully");
         return ResponseEntity.ok(new DomainResponse(httpResult, List.of(updatedCategoryMap), HttpStatus.OK));
+    }
+
+    @Operation(summary = "카테고리 조회", description = "카테고리 하나를 카테고리 아이디로 조회한다.")
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<DomainResponse> getCategoryById(@PathVariable Long categoryId) {
+        Category category = categoryService.findById(categoryId);
+        if (category == null) {
+            HttpResult httpResult = new HttpResult(HttpStatus.NOT_FOUND.value(), "Category not found");
+            return new ResponseEntity<>(new DomainResponse(httpResult, null, HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
+        }
+        Map<String, Object> categoryMap = new HashMap<>();
+        categoryMap.put("id", category.getId());
+        categoryMap.put("name", category.getName());
+        categoryMap.put("color", category.getColor());
+        categoryMap.put("imageUrl", category.getImageUrl());
+        categoryMap.put("description", category.getDescription());
+        HttpResult httpResult = new HttpResult(HttpStatus.OK.value(), "Category retrieved successfully");
+        return new ResponseEntity<>(new DomainResponse(httpResult, List.of(categoryMap), HttpStatus.OK), HttpStatus.OK);
+    }
+
+    @Operation(summary = "카테고리 삭제", description = "카테고리 아이디로 카테고리 하나를 삭제한다.")
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<DomainResponse> deleteCategory(@PathVariable Long categoryId) {
+        categoryService.delete(categoryId);
+        HttpResult httpResult = new HttpResult(HttpStatus.NO_CONTENT.value(), "Category deleted successfully");
+        return new ResponseEntity<>(new DomainResponse(httpResult, null, HttpStatus.NO_CONTENT), HttpStatus.NO_CONTENT);
     }
 }

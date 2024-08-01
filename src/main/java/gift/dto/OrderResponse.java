@@ -5,26 +5,39 @@ import gift.model.Order;
 import java.time.LocalDateTime;
 
 public class OrderResponse {
-    private Long id;
+    private Long productId;
     private Long optionId;
     private int quantity;
-    private String message;
     private LocalDateTime orderDateTime;
+    private String message;
+    private int pointsToUse;
+
+    public OrderResponse() {}
 
     public OrderResponse(Order order) {
-        this.id = order.getId();
+        this.productId = order.getProductOption().getProduct().getId();
         this.optionId = order.getProductOption().getId();
         this.quantity = order.getQuantity();
-        this.message = order.getMessage();
         this.orderDateTime = order.getOrderDateTime();
+        this.message = order.getMessage();
+        this.pointsToUse = order.getPointsToUse();
     }
 
-    public Long getId() {
-        return id;
+    public OrderResponse(Long productId, Long optionId, int quantity, LocalDateTime orderDateTime, String message, int pointsToUse) {
+        this.productId = productId;
+        this.optionId = optionId;
+        this.quantity = quantity;
+        this.orderDateTime = orderDateTime;
+        this.message = message;
+        this.pointsToUse = pointsToUse;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
     public Long getOptionId() {
@@ -43,6 +56,14 @@ public class OrderResponse {
         this.quantity = quantity;
     }
 
+    public LocalDateTime getOrderDateTime() {
+        return orderDateTime;
+    }
+
+    public void setOrderDateTime(LocalDateTime orderDateTime) {
+        this.orderDateTime = orderDateTime;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -51,11 +72,11 @@ public class OrderResponse {
         this.message = message;
     }
 
-    public LocalDateTime getOrderDateTime() {
-        return orderDateTime;
+    public int getPointsToUse() {
+        return pointsToUse;
     }
 
-    public void setOrderDateTime(LocalDateTime orderDateTime) {
-        this.orderDateTime = orderDateTime;
+    public void setPointsToUse(int pointsToUse) {
+        this.pointsToUse = pointsToUse;
     }
 }

@@ -1,5 +1,7 @@
 package gift.service;
 
+import gift.dto.ProductOptionRequest;
+import gift.dto.ProductOptionResponse;
 import gift.model.Product;
 import gift.model.ProductOption;
 import gift.repository.ProductOptionRepository;
@@ -8,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductOptionService {
@@ -19,32 +21,19 @@ public class ProductOptionService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<ProductOption> getOptionsByProductId(Long productId) {
-        return productOptionRepository.findByProductId(productId);
+    public List<ProductOptionResponse> getOptionsByProductId(Long productId) {
+        return productOptionRepository.findByProductId(productId).stream()
+                .map(ProductOptionResponse::new)
+                .collect(Collectors.toList());
     }
 
-    public ProductOption findProductOptionById(Long id) {
-        Optional<ProductOption> productOption = productOptionRepository.findById(id);
-        return productOption.orElse(null);
-    }
-
-    public void saveProductOption(ProductOption option) {
-        validateProductOption(option);
-        productOptionRepository.save(option);
+    public ProductOptionResponse findById(Long id) {
+        ProductOption productOption = productOptionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Option not found"));
+        return new ProductOptionResponse(productOption);
     }
 
     public void saveProductOptions(List<ProductOption> options) {
-        for (ProductOption option : options) {
-            validateProductOption(option);
-            if (existsByProductIdAndName(option.getProduct().getId(), option.getName())) {
-                throw new IllegalArgumentException("동일한 상품 내에 동일한 옵션 이름이 이미 존재합니다.");
-            }
-            productOptionRepository.save(option);
-        }
-    }
-
-    public boolean existsByProductIdAndName(Long productId, String name) {
-        return productOptionRepository.existsByProductIdAndName(productId, name);
+        productOptionRepository.saveAll(options);
     }
 
     public void deleteProductOptionsByProductId(Long productId) {
@@ -53,42 +42,32 @@ public class ProductOptionService {
     }
 
     public void subtractProductOptionQuantity(Long optionId, int quantityToSubtract) {
-        ProductOption option = findProductOptionById(optionId);
-        if (option == null) {
-            throw new IllegalArgumentException("Option not found");
-        }
+        ProductOption option = productOptionRepository.findById(optionId).orElseThrow(() -> new IllegalArgumentException("Option not found"));
         option.subtractQuantity(quantityToSubtract);
         productOptionRepository.save(option);
     }
 
-    public void addProductOption(Long productId, ProductOption productOption) {
+    public ProductOptionResponse addProductOption(Long productId, ProductOptionRequest productOptionRequest) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        ProductOption productOption = new ProductOption();
         productOption.setProduct(product);
-        validateProductOption(productOption);
-        productOptionRepository.save(productOption);
+        productOption.setName(productOptionRequest.getName());
+        productOption.setQuantity(productOptionRequest.getQuantity());
+        ProductOption savedOption = productOptionRepository.save(productOption);
+        return new ProductOptionResponse(savedOption);
     }
 
-    public void updateProductOption(Long productId, Long optionId, ProductOption productOption) {
+    public ProductOptionResponse updateProductOption(Long productId, Long optionId, ProductOptionRequest productOptionRequest) {
         ProductOption existingOption = productOptionRepository.findById(optionId).orElseThrow(() -> new IllegalArgumentException("Option not found"));
         Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        existingOption.setName(productOption.getName());
-        existingOption.setQuantity(productOption.getQuantity());
+        existingOption.setName(productOptionRequest.getName());
+        existingOption.setQuantity(productOptionRequest.getQuantity());
         existingOption.setProduct(product);
-        validateProductOption(existingOption);
-        productOptionRepository.save(existingOption);
+        ProductOption updatedOption = productOptionRepository.save(existingOption);
+        return new ProductOptionResponse(updatedOption);
     }
 
     public void deleteProductOption(Long productId, Long optionId) {
         productOptionRepository.deleteById(optionId);
-    }
-
-    private void validateProductOption(ProductOption option) {
-        if (option.getName() == null || option.getName().isEmpty() || option.getName().length() > 50 ||
-                !option.getName().matches("^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9\\s\\(\\)\\[\\]\\+\\-\\&\\/\\_]+$")) {
-            throw new IllegalArgumentException("옵션 이름은 공백을 포함하여 최대 50자까지 입력할 수 있으며, 특수 문자는 (),[],+,-,&,/,_만 가능합니다.");
-        }
-        if (option.getQuantity() < 1 || option.getQuantity() >= 100000000) {
-            throw new IllegalArgumentException("옵션 수량은 최소 1개 이상 1억 개 미만이어야 합니다.");
-        }
     }
 }

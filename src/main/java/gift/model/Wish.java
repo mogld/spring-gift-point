@@ -20,9 +20,12 @@ public class Wish {
     @JoinColumn(name = "product_option_id", nullable = false)
     private ProductOption productOption;
 
+    private int quantity;
+
     public Wish() {
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -49,5 +52,13 @@ public class Wish {
 
     public void setProductOption(ProductOption productOption) {
         this.productOption = productOption;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

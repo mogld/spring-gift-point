@@ -34,13 +34,14 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<DomainResponse> createOrder(@RequestBody OrderRequest orderRequest, @LoginMember Member member) {
         Order order = orderService.createOrder(orderRequest.getOptionId(), orderRequest.getQuantity(), orderRequest.getMessage(), member, orderRequest.getPointsToUse());
-        OrderResponse response = new OrderResponse(order);
+        OrderResponse response = new OrderResponse(order.getProductOption().getProduct().getId(), order.getProductOption().getId(), order.getQuantity(), order.getOrderDateTime(), order.getMessage(), order.getPointsToUse());
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("id", response.getId());
+        responseMap.put("productId", response.getProductId());
         responseMap.put("optionId", response.getOptionId());
         responseMap.put("quantity", response.getQuantity());
         responseMap.put("message", response.getMessage());
         responseMap.put("orderDateTime", response.getOrderDateTime());
+        responseMap.put("pointsToUse", response.getPointsToUse());
         HttpResult httpResult = new HttpResult(HttpStatus.CREATED.value(), "Order created successfully");
         return new ResponseEntity<>(new DomainResponse(httpResult, List.of(responseMap), HttpStatus.CREATED), HttpStatus.CREATED);
     }
@@ -52,11 +53,12 @@ public class OrderController {
         List<Map<String, Object>> orderList = orders.stream()
                 .map(order -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("id", order.getId());
+                    map.put("productId", order.getProductId());
                     map.put("optionId", order.getOptionId());
                     map.put("quantity", order.getQuantity());
                     map.put("message", order.getMessage());
                     map.put("orderDateTime", order.getOrderDateTime());
+                    map.put("pointsToUse", order.getPointsToUse());
                     return map;
                 })
                 .collect(Collectors.toList());
