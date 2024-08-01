@@ -21,7 +21,10 @@ public class PointService {
 
     @Transactional
     public void addPointsByEmail(String email, int points) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new IllegalArgumentException("Member not found");
+        }
         member.addPoints(points);
         memberRepository.save(member);
     }
