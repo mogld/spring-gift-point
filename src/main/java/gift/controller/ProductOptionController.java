@@ -38,7 +38,7 @@ public class ProductOptionController {
                 })
                 .collect(Collectors.toList());
 
-        productOptionService.addProductOptions(productId, productOptions);
+        productOptionService.saveProductOptions(productOptions);
 
         List<Map<String, Object>> responseList = productOptions.stream()
                 .map(option -> {
@@ -69,7 +69,7 @@ public class ProductOptionController {
     @Operation(summary = "상품 옵션 삭제", description = "기존 상품 옵션을 삭제한다.")
     @DeleteMapping("/{optionId}")
     public ResponseEntity<DomainResponse> deleteProductOption(@PathVariable Long productId, @PathVariable Long optionId) {
-        productOptionService.deleteProductOption(productId, optionId);
+        productOptionService.deleteProductOption(optionId);
 
         HttpResult httpResult = new HttpResult(HttpStatus.NO_CONTENT.value(), "Option deleted successfully");
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new DomainResponse(httpResult, null, HttpStatus.NO_CONTENT));

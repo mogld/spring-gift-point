@@ -18,7 +18,7 @@ public class ProductResponse {
         this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
-        this.imageUrl = product.getImageurl();
+        this.imageUrl = product.getImageUrl(); // Ensure this matches the method name in Product class
         this.categoryId = product.getCategory().getId();
         this.options = product.getOptions().stream().map(ProductOptionResponse::new).collect(Collectors.toList());
     }

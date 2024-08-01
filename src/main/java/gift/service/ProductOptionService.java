@@ -24,14 +24,12 @@ public class ProductOptionService {
     }
 
     public ProductOption findProductOptionById(Long id) {
-        Optional<ProductOption> productOption = productOptionRepository.findById(id);
-        return productOption.orElse(null);
+        return productOptionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ProductOption not found"));
     }
 
-    public void addProductOptions(Long productId, List<ProductOption> productOptions) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+    public void saveProductOptions(List<ProductOption> productOptions) {
         for (ProductOption option : productOptions) {
-            option.setProduct(product);
             validateProductOption(option);
             productOptionRepository.save(option);
         }
@@ -39,17 +37,14 @@ public class ProductOptionService {
 
     public void subtractProductOptionQuantity(Long optionId, int quantityToSubtract) {
         ProductOption option = findProductOptionById(optionId);
-        if (option == null) {
-            throw new IllegalArgumentException("Option not found");
-        }
         option.subtractQuantity(quantityToSubtract);
         productOptionRepository.save(option);
     }
 
-
     public ProductOption updateProductOption(Long productId, Long optionId, String name, int quantity) {
-        ProductOption existingOption = productOptionRepository.findById(optionId).orElseThrow(() -> new IllegalArgumentException("Option not found"));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        ProductOption existingOption = findProductOptionById(optionId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         existingOption.setName(name);
         existingOption.setQuantity(quantity);
         existingOption.setProduct(product);
@@ -57,17 +52,25 @@ public class ProductOptionService {
         return productOptionRepository.save(existingOption);
     }
 
-    public void deleteProductOption(Long productId, Long optionId) {
+    public void deleteProductOption(Long optionId) {
+        if (!productOptionRepository.existsById(optionId)) {
+            throw new IllegalArgumentException("ProductOption not found");
+        }
         productOptionRepository.deleteById(optionId);
     }
 
     private void validateProductOption(ProductOption option) {
         if (option.getName() == null || option.getName().isEmpty() || option.getName().length() > 50 ||
                 !option.getName().matches("^[가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9\\s\\(\\)\\[\\]\\+\\-\\&\\/\\_]+$")) {
-            throw new IllegalArgumentException("옵션 이름은 공백을 포함하여 최대 50자까지 입력할 수 있으며, 특수 문자는 (),[],+,-,&,/,_만 가능합니다.");
+            throw new IllegalArgumentException("Option name must be between 1 and 50 characters and can include only specific special characters.");
         }
         if (option.getQuantity() < 1 || option.getQuantity() >= 100000000) {
-            throw new IllegalArgumentException("옵션 수량은 최소 1개 이상 1억 개 미만이어야 합니다.");
+            throw new IllegalArgumentException("Option quantity must be between 1 and 100,000,000.");
         }
     }
+    public void deleteProductOptionsByProductId(Long productId) {
+        List<ProductOption> options = productOptionRepository.findByProductId(productId);
+        productOptionRepository.deleteAll(options);
+    }
+
 }

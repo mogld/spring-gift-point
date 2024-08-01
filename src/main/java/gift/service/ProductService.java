@@ -31,18 +31,26 @@ public class ProductService {
 
     public void save(Product product) {
         validateProductOptions(product);
-        Category category = categoryRepository.findById(product.getCategory().getId()).orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+        // Ensure category exists
+        Category category = categoryRepository.findById(product.getCategory().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category not found"));
         product.setCategory(category);
-        Product savedProduct = productRepository.save(product);  // 상품을 먼저 저장
+
+        // Save the product first
+        Product savedProduct = productRepository.save(product);
+
+        // Prepare and save product options
         List<ProductOption> options = product.getOptions().stream()
                 .map(option -> {
                     ProductOption newOption = new ProductOption();
                     newOption.setName(option.getName());
                     newOption.setQuantity(option.getQuantity());
-                    newOption.setProduct(savedProduct);  // 연관된 상품 설정
+                    newOption.setProduct(savedProduct);
                     return newOption;
                 })
                 .collect(Collectors.toList());
+
         try {
             productOptionService.saveProductOptions(options);
         } catch (IllegalArgumentException e) {
@@ -56,8 +64,13 @@ public class ProductService {
 
     public void update(Product updatedProduct) {
         validateProductOptions(updatedProduct);
-        Category category = categoryRepository.findById(updatedProduct.getCategory().getId()).orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+        // Ensure category exists
+        Category category = categoryRepository.findById(updatedProduct.getCategory().getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category not found"));
         updatedProduct.setCategory(category);
+
+        // Delete existing options and add new ones
         productOptionService.deleteProductOptionsByProductId(updatedProduct.getId());
         List<ProductOption> options = updatedProduct.getOptions().stream()
                 .map(option -> {
@@ -68,17 +81,19 @@ public class ProductService {
                     return newOption;
                 })
                 .collect(Collectors.toList());
+
         try {
             productOptionService.saveProductOptions(options);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+
         productRepository.save(updatedProduct);
     }
 
     public Product findById(Long id) {
-        Optional<Product> product = productRepository.findById(id);
-        return product.orElse(null);
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
     public void delete(Long id) {
@@ -89,7 +104,7 @@ public class ProductService {
     private void validateProductOptions(Product product) {
         List<ProductOption> options = product.getOptions();
         if (options == null || options.isEmpty()) {
-            throw new IllegalArgumentException("1개 이상의 옵션이 필요합니다.");
+            throw new IllegalArgumentException("At least one option is required.");
         }
     }
 }

@@ -12,8 +12,6 @@ public class OrderResponse {
     private String message;
     private int pointsToUse;
 
-
-
     public OrderResponse(Long productId, Long optionId, int quantity, LocalDateTime orderDateTime, String message, int pointsToUse) {
         this.productId = productId;
         this.optionId = optionId;
@@ -29,7 +27,7 @@ public class OrderResponse {
         this.quantity = order.getQuantity();
         this.orderDateTime = order.getOrderDateTime();
         this.message = order.getMessage();
-        this.pointsToUse = order.getPointsUsed();
+        this.pointsToUse = order.getPointsToUse(); // Corrected method name
     }
 
     public Long getProductId() {
