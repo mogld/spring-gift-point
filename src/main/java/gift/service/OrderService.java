@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Service
 public class OrderService {
@@ -32,10 +34,10 @@ public class OrderService {
     private KakaoMessageService kakaoMessageService;
 
     @Autowired
-    private HttpSession session;
+    private PointService pointService;
 
     @Autowired
-    private PointService pointService;
+    private HttpSession session;
 
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
         Page<Order> orders = orderRepository.findAll(pageable);
@@ -58,6 +60,9 @@ public class OrderService {
 
         Order order = new Order(productOption, member, quantity, message, LocalDateTime.now());
 
+        System.out.println("Original message: " + message);
+        System.out.println("Encoded message: " + order.getMessage());
+
         wishService.deleteWishByProductOptionIdAndMemberId(optionId, member.getId());
 
         Order savedOrder = orderRepository.save(order);
@@ -73,7 +78,10 @@ public class OrderService {
     }
 
     private String createKakaoMessage(Order order) {
+        String productName = order.getProductOption().getName();
+        String encodedProductName = java.net.URLEncoder.encode(productName, StandardCharsets.UTF_8);
+
         return String.format("{\"object_type\":\"text\",\"text\":\"order: %d of %s\",\"link\":{\"web_url\":\"http://localhost:8080/user-products\"}}",
-                order.getQuantity(), order.getProductOption().getProduct().getName());
+                order.getQuantity(), encodedProductName);
     }
 }
