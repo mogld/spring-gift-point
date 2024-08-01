@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class MemberService {
 
@@ -21,7 +23,7 @@ public class MemberService {
 
     @Transactional
     public Member register(String email, String password) {
-        if (memberRepository.findByEmail(email) != null) {
+        if (memberRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
         String encodedPassword = password.isEmpty() ? "" : passwordEncoder.encode(password);
@@ -33,7 +35,7 @@ public class MemberService {
 
     @Transactional
     public Member register(Member member) {
-        if (memberRepository.findByEmail(member.getEmail()) != null) {
+        if (memberRepository.findByEmail(member.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
         member.setPassword(passwordEncoder.encode(member.getPassword()));
@@ -42,16 +44,16 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Member authenticate(String email, String password) {
-        Member member = memberRepository.findByEmail(email);
-        if (member != null && passwordEncoder.matches(password, member.getPassword())) {
-            return member;
+        Optional<Member> optionalMember = memberRepository.findByEmail(email);
+        if (optionalMember.isPresent() && passwordEncoder.matches(password, optionalMember.get().getPassword())) {
+            return optionalMember.get();
         }
         return null;
     }
 
     @Transactional(readOnly = true)
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email);
+        return memberRepository.findByEmail(email).orElse(null);
     }
 
     @Transactional(readOnly = true)
