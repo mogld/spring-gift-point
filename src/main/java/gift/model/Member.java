@@ -19,6 +19,9 @@ public class Member {
     @Column(nullable = false)
     private int points = 0;
 
+    @Column
+    private String sns;
+
     @OneToMany(mappedBy = "member")
     private List<Wish> wishes;
 
@@ -51,6 +54,14 @@ public class Member {
 
     public void setPoints(int points) {
         this.points = points;
+    }
+
+    public String getSns() {
+        return sns;
+    }
+
+    public void setSns(String sns) {
+        this.sns = sns;
     }
 
     public List<Wish> getWishes() {

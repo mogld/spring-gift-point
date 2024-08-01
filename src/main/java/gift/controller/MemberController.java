@@ -36,9 +36,14 @@ public class MemberController {
             return new ResponseEntity<>(new DomainResponse(httpResult, List.of(Map.of("errors", bindingResult.getAllErrors().toString())), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
         }
         try {
-            MemberResponse memberResponse = memberService.register(memberRequest);
+            Member member = memberService.register(memberRequest.getEmail(), memberRequest.getPassword(), memberRequest.getSns());
+            MemberResponse response = new MemberResponse();
+            response.setId(member.getId());
+            response.setEmail(member.getEmail());
+            response.setPassword(member.getPassword());
+            response.setSns(memberRequest.getSns());
             HttpResult httpResult = new HttpResult(HttpStatus.OK.value(), "User registered successfully");
-            return new ResponseEntity<>(new DomainResponse(httpResult, List.of(memberResponse), HttpStatus.OK), HttpStatus.OK);
+            return new ResponseEntity<>(new DomainResponse(httpResult, List.of(Map.of("member", response)), HttpStatus.OK), HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             HttpResult httpResult = new HttpResult(HttpStatus.BAD_REQUEST.value(), e.getMessage());
             return new ResponseEntity<>(new DomainResponse(httpResult, List.of(Map.of("error", e.getMessage())), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
@@ -48,7 +53,7 @@ public class MemberController {
     @Operation(summary = "로그인", description = "회원을 인증하고 토큰을 받는다.")
     @PostMapping("/login")
     public ResponseEntity<DomainResponse> login(@RequestBody MemberRequest memberRequest) {
-        MemberResponse authenticatedMember = memberService.authenticate(memberRequest.getEmail(), memberRequest.getPassword());
+        Member authenticatedMember = memberService.authenticate(memberRequest.getEmail(), memberRequest.getPassword());
         if (authenticatedMember != null) {
             String token = JwtTokenUtil.generateToken(authenticatedMember);
             HttpResult httpResult = new HttpResult(HttpStatus.OK.value(), "Login successful");

@@ -1,7 +1,5 @@
 package gift.service;
 
-import gift.dto.MemberRequest;
-import gift.dto.MemberResponse;
 import gift.model.Member;
 import gift.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,39 +20,34 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberResponse register(MemberRequest memberRequest) {
-        if (memberRepository.findByEmail(memberRequest.getEmail()) != null) {
+    public Member register(String email, String password, String sns) {
+        if (memberRepository.findByEmail(email) != null) {
             throw new IllegalArgumentException("Email already exists");
         }
-        String encodedPassword = passwordEncoder.encode(memberRequest.getPassword());
+        String encodedPassword = passwordEncoder.encode(password);
         Member member = new Member();
-        member.setEmail(memberRequest.getEmail());
+        member.setEmail(email);
         member.setPassword(encodedPassword);
-        Member savedMember = memberRepository.save(member);
-        return new MemberResponse(savedMember);
+        member.setSns(sns);
+        return memberRepository.save(member);
     }
 
     @Transactional(readOnly = true)
-    public MemberResponse authenticate(String email, String password) {
+    public Member authenticate(String email, String password) {
         Member member = memberRepository.findByEmail(email);
         if (member != null && passwordEncoder.matches(password, member.getPassword())) {
-            return new MemberResponse(member);
+            return member;
         }
         return null;
     }
 
     @Transactional(readOnly = true)
-    public MemberResponse findByEmail(String email) {
-        Member member = memberRepository.findByEmail(email);
-        if (member == null) {
-            throw new IllegalArgumentException("Member not found");
-        }
-        return new MemberResponse(member);
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email);
     }
 
     @Transactional(readOnly = true)
-    public MemberResponse findById(Long id) {
-        Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Member not found"));
-        return new MemberResponse(member);
+    public Member findById(Long id) {
+        return memberRepository.findById(id).orElse(null);
     }
 }

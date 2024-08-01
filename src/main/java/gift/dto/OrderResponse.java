@@ -12,16 +12,7 @@ public class OrderResponse {
     private String message;
     private int pointsToUse;
 
-    public OrderResponse() {}
 
-    public OrderResponse(Order order) {
-        this.productId = order.getProductOption().getProduct().getId();
-        this.optionId = order.getProductOption().getId();
-        this.quantity = order.getQuantity();
-        this.orderDateTime = order.getOrderDateTime();
-        this.message = order.getMessage();
-        this.pointsToUse = order.getPointsToUse();
-    }
 
     public OrderResponse(Long productId, Long optionId, int quantity, LocalDateTime orderDateTime, String message, int pointsToUse) {
         this.productId = productId;
@@ -30,6 +21,15 @@ public class OrderResponse {
         this.orderDateTime = orderDateTime;
         this.message = message;
         this.pointsToUse = pointsToUse;
+    }
+
+    public OrderResponse(Order order) {
+        this.productId = order.getProductOption().getProduct().getId();
+        this.optionId = order.getProductOption().getId();
+        this.quantity = order.getQuantity();
+        this.orderDateTime = order.getOrderDateTime();
+        this.message = order.getMessage();
+        this.pointsToUse = order.getPointsUsed();
     }
 
     public Long getProductId() {

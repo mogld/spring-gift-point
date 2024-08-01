@@ -51,14 +51,14 @@ public class OrderService {
             throw new IllegalArgumentException("Invalid product option");
         }
 
-        productOptionService.subtractProductOptionQuantity(optionId, quantity);
+        productOptionService.subtractProductOptionQuantity(optionId, quantity );
 
         // Use points
         if (pointsToUse > 0) {
             pointService.usePoints(member.getId(), pointsToUse);
         }
 
-        Order order = new Order(productOption, member, quantity, message, LocalDateTime.now());
+        Order order = new Order(productOption, member, quantity, message, LocalDateTime.now(), pointsToUse);
 
         System.out.println("Original message: " + message);
         System.out.println("Encoded message: " + order.getMessage());

@@ -1,17 +1,11 @@
 package gift.dto;
 
-import gift.model.Member;
-
 public class MemberResponse {
+
     private Long id;
     private String email;
     private String password;
-
-    public MemberResponse(Member member) {
-        this.id = member.getId();
-        this.email = member.getEmail();
-        this.password = member.getPassword();
-    }
+    private String sns;
 
     // Getters and Setters
     public Long getId() {
@@ -36,5 +30,13 @@ public class MemberResponse {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getSns() {
+        return sns;
+    }
+
+    public void setSns(String sns) {
+        this.sns = sns;
     }
 }

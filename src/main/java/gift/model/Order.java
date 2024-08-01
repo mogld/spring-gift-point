@@ -25,17 +25,19 @@ public class Order {
     @Lob
     private String message;
     private LocalDateTime orderDateTime;
+    private int pointsToUse;
 
 
     public Order() {
     }
 
-    public Order(ProductOption productOption, Member member, int quantity, String message, LocalDateTime orderDateTime) {
+    public Order(ProductOption productOption, Member member, int quantity, String message, LocalDateTime orderDateTime, int pointsToUse) {
         this.productOption = productOption;
         this.member = member;
         this.quantity = quantity;
         this.setMessage(message);
         this.orderDateTime = orderDateTime;
+        this.pointsToUse = pointsToUse;
     }
 
 
@@ -87,5 +89,13 @@ public class Order {
 
     public void setOrderDateTime(LocalDateTime orderDateTime) {
         this.orderDateTime = orderDateTime;
+    }
+
+    public int getPointsToUse() {
+        return pointsToUse;
+    }
+
+    public void setPointsToUse(int pointsToUse) {
+        this.pointsToUse = pointsToUse;
     }
 }
