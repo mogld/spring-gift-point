@@ -75,16 +75,16 @@
     <div class="d-flex justify-content-center">
         <nav aria-label="Page navigation example">
             <ul class="pagination">
-                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                    <a class="page-link" th:href="@{/products(page=${currentPage - 1}, size=${pageSize})}" aria-label="Previous">
+                <li class="page-item" th:classappend="${currentPage == null or currentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/products(page=${currentPage != null ? currentPage - 1 : 0}, size=${pageSize})}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
-                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:classappend="${i == currentPage} ? 'active'">
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages != null ? totalPages - 1 : 0)}" th:classappend="${i == currentPage} ? 'active'">
                     <a class="page-link" th:href="@{/products(page=${i}, size=${pageSize})}" th:text="${i + 1}">1</a>
                 </li>
-                <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
-                    <a class="page-link" th:href="@{/products(page=${currentPage + 1}, size=${pageSize})}" aria-label="Next">
+                <li class="page-item" th:classappend="${currentPage != null ? currentPage + 1 == totalPages : false} ? 'disabled'">
+                    <a class="page-link" th:href="@{/products(page=${currentPage != null ? currentPage + 1 : 0}, size=${pageSize})}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
