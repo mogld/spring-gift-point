@@ -63,6 +63,7 @@ public class WishController {
     @Operation(summary = "위시 리스트 상품 추가", description = "회원의 위시 리스트에 상품을 추가한다.")
     @PostMapping
     public DomainResponse addWish(@RequestBody WishRequest wishRequest, @LoginMember Member member) {
+        System.out.println("Received Wish Request: " + wishRequest); // 디버깅 메시지 추가
         Product product = productService.findById(wishRequest.getProductId());
         ProductOption productOption = productOptionService.findProductOptionById(wishRequest.getOptionId());
         if (productOption == null) {

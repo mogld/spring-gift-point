@@ -99,7 +99,9 @@
         const token = localStorage.getItem('jwtToken');
         const selectedOptionId = document.getElementById(`optionDropdown_${productId}`).value;
 
-        fetch('/wishes', {
+        console.log('Selected Option ID:', selectedOptionId); // 디버깅 메시지 추가
+
+        fetch('/api/wishes', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -120,6 +122,7 @@
                 console.error('Error:', error);
             });
     }
+
 </script>
 </body>
 </html>
